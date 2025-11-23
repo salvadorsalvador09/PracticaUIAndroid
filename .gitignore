@@ -1,0 +1,46 @@
+# Gradle
+.gradle/
+**/build/
+!src/**/build/
+local.properties
+
+# Android Studio/IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Generated files
+captures/
+outputs/
+navigation.json
+
+# Kotlin/Java artifacts
+*.class
+*.jar
+*.war
+*.ear
+
+# NDK/Native
+obj/
+*.so
+*.o
+
+# Jetpack Compose previews
+/.compose-cache/
+
+# Firebase/Google services (solo si NO quieres subir la config)
+# google-services.json
+# GoogleService-Info.plist
+
+# Keystore (MUY IMPORTANTE)
+*.keystore
+*.jks
+key.properties
