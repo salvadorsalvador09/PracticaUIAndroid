@@ -32,12 +32,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.example.composepractica.ui.theme.ComposePracticaTheme
 import android.util.Log
+import androidx.collection.emptyLongSet
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.text.style.TextAlign
 
 class MainActivity : ComponentActivity() {
@@ -47,210 +50,82 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ComposePracticaTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    var show by remember { mutableStateOf(false) }
-                    Column {
-
-                        OpenDialogButton(
-                            onClickHandle = {
-                                show = true
-                            }
-                        )
-                        CloseWindowDialog(
-                            show = show,
-                            onDismiss = { show = false },
-                            onConfirm = { show = false }
-                        )
-                    }
-                }
+                MainCotainer()
             }
         }
     }
 }
 
+
+fun intToColor(color: Int): Color
+{
+    return when(color){
+        1 -> Color.Red
+        2 -> Color.Green
+        3 -> Color.Blue
+        4 -> Color.Yellow
+        5 -> Color.Magenta
+        6 -> Color.Cyan
+        7 -> Color.White
+        8 -> Color.Black
+        9 -> Color.Gray
+        else -> Color.Black
+    }
+}
+
 @Composable
-fun OpenDialogButton(
-    onClickHandle: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
-    Button(
-        onClick = { onClickHandle() },
-        modifier = modifier
-            .padding(145.dp)
+fun MainCotainer(){
+    var backgroundColor by remember { mutableIntStateOf(1)  }
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = intToColor(backgroundColor)
     ) {
-        Text(text = "Close Page")
-    }
-}
-
-@Composable
-fun CloseWindowDialog(
-    show: Boolean,
-    onDismiss: () -> Unit,
-    onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    if (show) {
-        AlertDialog(
-            onDismissRequest = { onDismiss() },
-            confirmButton = {
-                OutlinedButton(
-                    onClick = { onDismiss() },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = colorResource(id = R.color.confirm_button_red)
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        color = colorResource(id = R.color.confirm_button_red)
-                    )
-                )
-                {
-                    Text(text = "Si, cerrar")
-                }
-            },
-            dismissButton = {
-                OutlinedButton(
-                    onClick = { onConfirm() },
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        containerColor = Color.Transparent,
-                        contentColor = colorResource(id = R.color.dismiss_button_green)
-                    ),
-                    border = BorderStroke(
-                        1.dp,
-                        color = colorResource(id = R.color.dismiss_button_green)
-                    )
-                )
-                {
-                    Text(text = "Cancelar")
-                }
-            },
-            title = {
-                Text(
-                    text = "¿Estas seguro de salir de esta página?",
-                    fontWeight = FontWeight.Black,
-                    textAlign = TextAlign.Center
-                )
-            },
-            text = {
-                Text(
-                    text = "Una ves que salgas de esta pagina, todo progreso que no hayas sido guardado se perdará"
-                )
-            },
-            containerColor = Color.White,
-            shape = RectangleShape,
-            modifier = modifier
+        ChangeBackgroundScreen(
+            changeBackgroundColor = {backgroundColor = it}
         )
     }
-
 }
 
 @Composable
-fun MyTextComponent(name: String, modifier: Modifier = Modifier) {
-    val myPerson = Person("Majo", "Euan")
-    Text(
-        text = "Hola, ${myPerson.name} ${myPerson.lastName}! Soy mira mi componente!",
-        color = Color.Red
-    )
-}
-
-@Composable
-fun MySlider(modifier: Modifier = Modifier) {
-    var sliderVal by remember { mutableStateOf(0f) }
-    Column {
+fun ColorSlider(
+    modifier: Modifier = Modifier,
+    value: Float ,
+    onValueChange: (Float) -> Unit
+) {
+    Column (Modifier.padding(top=60.dp)){
         Slider(
-            value = sliderVal,
-            valueRange = 0f..10f,
-            steps = 10,
-            onValueChange = { sliderVal = it },
-            colors = SliderDefaults.colors(
-                thumbColor = colorResource(id = R.color.purple_200),
-                activeTickColor = Color.White,
-                activeTrackColor = Color.Cyan,
-                inactiveTickColor = Color.Blue,
-                inactiveTrackColor = Color.LightGray
-            ),
-            modifier = modifier
-                .size(500.dp)
-                .padding(20.dp) //Margin
-                .padding(80.dp) //Padding
+            value = value,
+            onValueChange = { onValueChange(it) },
+            valueRange = 1f..9f,
+            steps = 7,
+            modifier = Modifier.padding(20.dp)
+                .padding(20.dp)
         )
-        Text(text = sliderVal.toString())
+        Text(
+            text = value.toString(),
+            modifier = Modifier.padding(20.dp)
+        )
     }
 }
 
-@Composable
-fun MySwitch(modifier: Modifier = Modifier) {
-    var checked by remember { mutableStateOf(true) }
 
-    Switch(
-        checked = false,
-        onCheckedChange = { checked = it },
-        colors = SwitchDefaults.colors(
-            checkedThumbColor = Color.Blue,
-            checkedBorderColor = Color.LightGray,
-            checkedTrackColor = Color.LightGray,
-            uncheckedThumbColor = Color.Black,
-            uncheckedBorderColor = Color.Gray,
-            uncheckedTrackColor = Color.Black
-        ),
-        modifier = modifier
-            .padding(20.dp) //margin
-            .padding(5.dp) // padding
+@Composable
+fun ChangeBackgroundScreen(
+    modifier: Modifier = Modifier,
+        changeBackgroundColor: (Int) -> Unit
+){
+    var value by remember { mutableStateOf(1f) }
+    ColorSlider(
+        value = value,
+        onValueChange = {
+            value = it
+            changeBackgroundColor(it.toInt())}
     )
-}
-
-
-@Composable
-fun MyDialog(
-    modifier: Modifier = Modifier, showDialog: Boolean,
-    dimissDialog: () -> Unit,
-    confirmDialog: () -> Unit
-) {
-    if (showDialog) {
-        AlertDialog(
-            onDismissRequest = { dimissDialog() },
-            confirmButton = {
-                TextButton(onClick = { confirmDialog() }) {
-                    Text(text = "Confirmar")
-                }
-            },
-            dismissButton = {
-                Button(onClick = { dimissDialog() })
-                {
-                    Text(text = "Cancelar")
-                }
-            },
-            title = {
-                Text(
-                    text = "Eliminar Archivo",
-                    fontWeight = FontWeight.Black
-                )
-            },
-            text = {
-                Text(
-                    text = "¿Deseas eliminar este archivo?",
-                    color = Color.DarkGray
-                )
-            },
-            containerColor = Color.White,
-            titleContentColor = colorResource(id = R.color.purple_200),
-            shape = RoundedCornerShape(10.dp),
-            properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false)
-        )
-    }
-}
-
-class Person(n: String, l: String) {
-    val name: String = n
-    val lastName: String = l
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    ComposePracticaTheme {
-    }
+    var value by remember { mutableStateOf(1f) }
+    MainCotainer()
 }
